@@ -344,7 +344,7 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
    }
      if (result) {
      db.query(retrieved, (id), 
-     (err, resultRetrieved) => {
+     (err, resultRetrieved) => { 
       if (err) {
       res.send({message: err}) //Sending error to front-end
       console.log(err);
