@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
-   origin: ["https://walido-webapp.herokuapp.com"], 
+   origin: ["http://localhost:3000"], 
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
@@ -356,7 +356,6 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
 })};
 })}})});
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log('\x1b[32m%s\x1b[0m',`Server running on port ${port}`);
-});
+app.listen(3001, () => {
+  console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!')
+}); //port number server is running on
