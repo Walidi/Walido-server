@@ -3,7 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 const multer = require("multer")
 var fs = require('fs');
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -359,6 +359,6 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
 })};
 })}})});
 
-app.listen(process.env.PORT || port, () => {
+app.listen(port, () => {
   console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!')
 }); //port number server is running on
