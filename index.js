@@ -3,6 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 const multer = require("multer")
 var fs = require('fs');
+const port = 3001;
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -22,6 +23,8 @@ app.use(cors({   //Parsing origin of the front-end
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
+
+app.get('/', (req, res) => res.send("Hi!"));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -356,6 +359,6 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
 })};
 })}})});
 
-app.listen(3001, () => {
+app.listen(process.env.PORT || port, () => {
   console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!')
 }); //port number server is running on
