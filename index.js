@@ -356,8 +356,6 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
 })};
 })}})});
 
-const port = process.env.PORT || 3000;
-
-app.listen(port,()=>{  // do not add localhost here if you are deploying it
+app.listen(process.env.PORT || 3000, ()=>{  // do not add localhost here if you are deploying it
   console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!');
 }); //port number server is running on  
