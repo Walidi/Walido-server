@@ -356,6 +356,8 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
 })};
 })}})});
 
-app.listen(3001, () => {
-  console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!')
+const port = process.env.PORT || 3000;
+
+app.listen(port, function () {
+  console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!');
 }); //port number server is running on  
