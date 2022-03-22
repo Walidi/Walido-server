@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
 
-const bcrypt = require('bcrypt'); //Cryption function
+const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 
 const jwt = require('jsonwebtoken');
