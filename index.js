@@ -308,7 +308,7 @@ app.get('/users', verifyJWT, (req, res) => {
   }
 });
 });
-
+ 
 app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
   const name = req.body.name;
   const email = req.body.email;
