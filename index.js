@@ -290,7 +290,7 @@ app.post('/authenticate', (req, res) => { //An endpoint for user-auth
 });
 
 
-app.get('/users', verifyJWT, (req, res) => {
+app.get('/users', (req, res) => {
 
   db.query("SELECT id, name, email, phoneNr FROM users;", 
 
