@@ -104,6 +104,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         (err, result) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
+            res.header("Access-Control-Allow-Origin", "*");
             console.log(err);  
          }
       if (result) {
@@ -111,12 +112,14 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
+               res.header("Access-Control-Allow-Origin", "*");
                console.log(err);
              }
       if (result) {
             var filePath = `./cvUploads/${req.file.filename}`; 
             req.session.user[0].cvFile = req.file.filename;
             res.send({user: req.session.user, message: req.file.filename.substring(14) +  " has been uploaded!"});
+            res.header("Access-Control-Allow-Origin", "*");
             res.download(filePath, req.file.filename);
              }
              else {
@@ -131,6 +134,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         (err, result) => {
           if (err)  {
               res.send({err: err}) //Sending error to front-end
+              res.header("Access-Control-Allow-Origin", "*");
               console.log(err);
            } 
        
@@ -139,11 +143,12 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         //If so, then do this by retrieving fileName from database related to the user:        
         var filePath = `./cvUploads/${fileName}`; // Or format the path using the `id` rest param
         res.download(filePath, fileName);    
-        //next();
+        res.header("Access-Control-Allow-Origin", "*");
         console.log('Succesfully sending ' + fileName + ' back to client!\nAnd location: ' + filePath);
         }
         else {
           res.send({message: "No file found for you!"});
+          res.header("Access-Control-Allow-Origin", "*");
           console.log('No file found in database belonging to user');
         }
     })});
@@ -154,6 +159,7 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
   (err, result) => {
     if (err)  {
       res.send({message: JSON.stringify(err)}) //Sending error to front-end
+      res.header("Access-Control-Allow-Origin", "*");
       console.log(err);  
    }
    if (result) {
@@ -161,6 +167,7 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
    (err, result) => {
      if (err) {
       res.send({message: JSON.stringify(err)}) //Sending error to front-end
+      res.header("Access-Control-Allow-Origin", "*");
       console.log(err);  
      }
      if (result) {
@@ -170,6 +177,7 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
       console.log(fileName + ' was deleted from user');
       req.session.user[0].cvFile = "No file uploaded";
       res.send({user: req.session.user, message: "File deleted!"})
+      res.header("Access-Control-Allow-Origin", "*");
       db.query("UPDATE users SET cvFile = 'No file uploaded' WHERE id = ?;", (req.session.user[0].id),
       (err, result) => {
         if (err){
@@ -199,6 +207,7 @@ app.post('/register', (req, res) => {
      (err, result) => {
        if (result.length>0) {  //If the email from the requester already exists we send back a message and cancel the registration
          res.send({message: "Email already exists!"})
+         res.header("Access-Control-Allow-Origin", "*");
        }
        else {
     
@@ -206,6 +215,7 @@ app.post('/register', (req, res) => {
         (err, result) => {
          if(result.length>0) {
             res.send({message: "Phone number already exists!"})
+            res.header("Access-Control-Allow-Origin", "*");
           }
 
        else { 
@@ -220,6 +230,7 @@ app.post('/register', (req, res) => {
           [email, hash, sirname, phoneNr, bachelorDegree, masterDegree, cvFile],
           (err, result) => {
              res.send({err: err});
+             res.header("Access-Control-Allow-Origin", "*");
              console.log(err);
           }
         );
@@ -239,6 +250,7 @@ app.post('/login', async(req, res) => {
   (err, result) => {
    if (err)  {
        res.send({err: err}) //Sending error to front-end
+       res.header("Access-Control-Allow-Origin", "*");
     } 
 
    if (result.length>0) { //Checking if username input returns a row
@@ -250,11 +262,13 @@ app.post('/login', async(req, res) => {
            })
            req.session.user = result; //Creating session for the user!
            res.send({auth: true, token: token, user: result}); //Passing authenticated user   (result = row = user)
+           res.header("Access-Control-Allow-Origin", "*");
            console.log("Session is: " + JSON.stringify(req.session.user));
            res.end();
 
           } else { //If there is no response, it means the password is wrong but username is correct!
             res.send({auth: false, message: "Wrong email/password!"});
+            
           }
        })
      } else {    //If nothing is matched from the inputs!
@@ -278,15 +292,18 @@ app.post('/authenticate', (req, res) => { //An endpoint for user-auth
      
     if (err) {
     res.send({auth: false, user: "No valid token!"});
+    res.header("Access-Control-Allow-Origin", "*");
     console.log('No valid token');
     } 
     else if (userSession) {   //Verified user! < ----------------->
       res.send({auth: true, user: userSession});
+      res.header("Access-Control-Allow-Origin", "*");
       //console.log(userSession[0].name + ' is in!');
       console.log("Session is: " + JSON.stringify(req.session.user));
     }
     else   { //Else if user is not verified, we return an empty object with rejected authentication 
     res.send({auth: false, user: 'No user session!'});
+    res.header("Access-Control-Allow-Origin", "*");
     console.log('No user session');
     }
 })
@@ -324,6 +341,7 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
   (err, result) => {
   if (result.length>0 && req.session.user[0].email != email) {  
       res.send({user: req.session.user, message: "Email already in use!"})
+      res.header("Access-Control-Allow-Origin", "*");
     } 
     
   else {
@@ -332,6 +350,7 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
     (err, result) => {
   if(result.length>0 && req.session.user[0].phoneNr != phoneNr) {
         res.send({user: req.session.user, message: "Phone number already in use!"})
+        res.header("Access-Control-Allow-Origin", "*");
       }
    
    else {
@@ -343,6 +362,7 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
     (err, result) => {
     if (err)  {
       res.send({message: err}) //Sending error to front-end
+      res.header("Access-Control-Allow-Origin", "*");
       console.log(err);
    }
      if (result) {
@@ -350,10 +370,12 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
      (err, resultRetrieved) => { 
       if (err) {
       res.send({message: err}) //Sending error to front-end
+      res.header("Access-Control-Allow-Origin", "*");
       console.log(err);
    } else {
        req.session.user = resultRetrieved;
        res.send({user: resultRetrieved, message: "Update succesful!"});
+       res.header("Access-Control-Allow-Origin", "*");
        console.log("Session is: " + JSON.stringify(req.session.user));
        console.log("UPDATE SUCCES!");
        res.end();
