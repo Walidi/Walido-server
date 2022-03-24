@@ -29,13 +29,6 @@ app.get('/', (req, res) => res.send("Hi!"));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req,res,next)=>{
-  res.setHeader('Acces-Control-Allow-Origin','*');
-  res.setHeader('Acces-Control-Allow-Methods','GET,POST,PUT,PATCH,DELETE');
-  res.setHeader('Acces-Contorl-Allow-Methods','Content-Type','Authorization');
-  next(); 
-})
-
 app.set('trust proxy', 1)
 
 app.use(
