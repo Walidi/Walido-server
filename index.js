@@ -36,10 +36,10 @@ app.use(
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
     resave: false,
-    rolling: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
+      secure: (process.env.NODE_ENV && process.env.NODE_ENV == 'production') ? true:false
     }
   }));
 
