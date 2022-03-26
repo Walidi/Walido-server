@@ -8,6 +8,7 @@ const port = process.env.PORT || 3001;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
+const MySQLStore = require("express-mysql-session")(session);
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
@@ -35,6 +36,7 @@ app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
+    store: sessionStore,
     resave: false,
     saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
@@ -49,6 +51,19 @@ const db = mysql.createPool({  //Consider putting these values into environment 
      password: "Ww74!ab!fL6B",
      database: "webapptest2300",
 });
+
+var sessionStore = new MySQLStore({
+  expiration: 10800000,
+  createDatabaseTable: true,
+  schema:{
+      tableName: 'userSession',
+      columnNames:{
+          session_id: 'sesssion_id',
+          expires: 'expires',
+          data: 'data'
+      }
+  }
+},db)
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
