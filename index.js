@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
-   origin: ["https://walido.herokuapp.com"], 
+   origin: ["http://walido.herokuapp.com"], 
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
@@ -29,6 +29,26 @@ app.get('/', (req, res) => res.send("Hi!"));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const db = mysql.createPool({  //Consider putting these values into environment variables 
+  user: "webapptest2300",
+  host: "den1.mysql4.gear.host",
+  password: "Ww74!ab!fL6B",
+  database: "webapptest2300",
+});
+
+var sessionStore = new MySQLStore({
+expiration: 10800000,
+createDatabaseTable: true,
+schema:{
+   tableName: 'userSession',
+   columnNames:{
+       session_id: 'sesssion_id',
+       expires: 'expires',
+       data: 'data'
+   } 
+}
+},db)
 
 app.set('trust proxy', 1)
 
@@ -41,29 +61,10 @@ app.use(
     saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      secure: (process.env.NODE_ENV && process.env.NODE_ENV == 'production') ? true:false
+      httpOnly: false
     }
   }));
 
-const db = mysql.createPool({  //Consider putting these values into environment variables 
-     user: "webapptest2300",
-     host: "den1.mysql4.gear.host",
-     password: "Ww74!ab!fL6B",
-     database: "webapptest2300",
-});
-
-var sessionStore = new MySQLStore({
-  expiration: 10800000,
-  createDatabaseTable: true,
-  schema:{
-      tableName: 'userSession',
-      columnNames:{
-          session_id: 'sesssion_id',
-          expires: 'expires',
-          data: 'data'
-      }
-  }
-},db)
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -130,7 +131,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
       if (result) {
             var filePath = `./cvUploads/${req.file.filename}`; 
             req.session.user[0].cvFile = req.file.filename;
-            res.send({user: req.session.user, message: req.file.filename.substring(14) +  " has been uploaded!"});
+            res.send({user: req.session.user, message: req.file.filename.substring(14) + " has been uploaded!"});
             res.download(filePath, req.file.filename);
              }
              else {
@@ -280,6 +281,7 @@ app.post('/login', async(req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy();  //Kills session
+  sessionStore.close();
   res.send("Logout success!"); //Sends response to client
 });
 
