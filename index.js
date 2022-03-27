@@ -61,7 +61,8 @@ app.use(
     saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      httpOnly: false
+      httpOnly: false,
+      domain: ".herokuapp.com"
     }
   }));
 
@@ -298,7 +299,6 @@ app.post('/authenticate', (req, res) => { //An endpoint for user-auth
     } 
     else if (userSession) {   //Verified user! < ----------------->
       res.send({auth: true, user: userSession});
-      //console.log(userSession[0].name + ' is in!');
       console.log("Session is: " + JSON.stringify(req.session.user));
     }
     else   { //Else if user is not verified, we return an empty object with rejected authentication 
