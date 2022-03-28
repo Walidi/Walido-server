@@ -62,8 +62,9 @@ app.use(
     proxy: true,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      sameSite:'none',
-      secure:true
+      sameSite: "none",
+      secure: true,
+      httpOnly: true
     } 
   }));
 
