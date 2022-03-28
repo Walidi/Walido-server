@@ -16,7 +16,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
 const app = express();
-
+ 
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
