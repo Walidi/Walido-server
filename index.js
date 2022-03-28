@@ -8,7 +8,6 @@ const port = process.env.PORT || 3001;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
-//const MySQLStore = require("express-mysql-session")(session);
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
@@ -16,7 +15,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
 const app = express();
- 
+
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
@@ -30,44 +29,24 @@ app.get('/', (req, res) => res.send("Hi!"));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = mysql.createPool({  //Consider putting these values into environment variables 
-  user: "webapptest2300",
-  host: "den1.mysql4.gear.host",
-  password: "Ww74!ab!fL6B",
-  database: "webapptest2300",
-});
-/*
-var sessionStore = new MySQLStore({
-expiration: 10800000,
-createDatabaseTable: true,
-schema:{
-   tableName: 'userSession',
-   columnNames:{
-       session_id: 'sesssion_id',
-       expires: 'expires',
-       data: 'data'
-   } 
-}
-},db)*/
-
-app.set('trust proxy', 1)
-
 app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
-    //store: sessionStore,
     resave: false,
-    saveUninitialized: true,
-    proxy: true,
+    rolling: true,
+    saveUninitialized: false,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      sameSite: "none",
-      secure: true,
-      httpOnly: true
-    } 
+    }
   }));
 
+const db = mysql.createPool({  //Consider putting these values into environment variables 
+     user: "webapptest2300",
+     host: "den1.mysql4.gear.host",
+     password: "Ww74!ab!fL6B",
+     database: "webapptest2300",
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -134,7 +113,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
       if (result) {
             var filePath = `./cvUploads/${req.file.filename}`; 
             req.session.user[0].cvFile = req.file.filename;
-            res.send({user: req.session.user, message: req.file.filename.substring(14) + " has been uploaded!"});
+            res.send({user: req.session.user, message: req.file.filename.substring(14) +  " has been uploaded!"});
             res.download(filePath, req.file.filename);
              }
              else {
@@ -284,7 +263,6 @@ app.post('/login', async(req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy();  //Kills session
-  sessionStore.close();
   res.send("Logout success!"); //Sends response to client
 });
 
@@ -301,6 +279,7 @@ app.post('/authenticate', (req, res) => { //An endpoint for user-auth
     } 
     else if (userSession) {   //Verified user! < ----------------->
       res.send({auth: true, user: userSession});
+      //console.log(userSession[0].name + ' is in!');
       console.log("Session is: " + JSON.stringify(req.session.user));
     }
     else   { //Else if user is not verified, we return an empty object with rejected authentication 
@@ -329,7 +308,7 @@ app.get('/users', verifyJWT, (req, res) => {
   }
 });
 });
- 
+
 app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
   const name = req.body.name;
   const email = req.body.email;
