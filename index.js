@@ -8,7 +8,7 @@ const port = process.env.PORT || 3001;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
-const MySQLStore = require("express-mysql-session")(session);
+//const MySQLStore = require("express-mysql-session")(session);
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
-   origin: "http://localhost:3000", 
+   origin: ["http://localhost:3000"], 
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
@@ -56,7 +56,7 @@ app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
-    store: sessionStore,
+    //store: sessionStore,
     resave: false,
     saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
