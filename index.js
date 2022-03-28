@@ -36,7 +36,7 @@ const db = mysql.createPool({  //Consider putting these values into environment 
   password: "Ww74!ab!fL6B",
   database: "webapptest2300",
 });
-
+/*
 var sessionStore = new MySQLStore({
 expiration: 10800000,
 createDatabaseTable: true,
@@ -48,7 +48,7 @@ schema:{
        data: 'data'
    } 
 }
-},db)
+},db)*/
 
 app.set('trust proxy', 1)
 
