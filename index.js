@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
-   origin: "https://walido.herokuapp.com", 
+   origin: "http://localhost:3000", 
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
@@ -61,8 +61,6 @@ app.use(
     saveUninitialized: true,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      httpOnly: false,
-      domain: "walido.herokuapp.com"
     }
   }));
 
