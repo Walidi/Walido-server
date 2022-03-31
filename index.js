@@ -1,4 +1,5 @@
 const express = require("express");
+const MySQLStore = require("express-mysql-session")(session);
 const mysql = require ('mysql');
 const cors = require('cors');
 const multer = require("multer")
@@ -29,10 +30,24 @@ app.get('/', (req, res) => res.send("Hi!"));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+var sessionStore = new MySQLStore({
+  expiration: 10800000,
+  createDatabaseTable: true,
+  schema:{
+      tableName: 'sessionTable',
+      columnNames:{
+          session_id: 'sesssion_id',
+          expires: 'expires',
+          data: 'data'
+      }
+  }
+},db)
+
 app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
+    store: sessionStore,
     resave: false,
     rolling: true,
     saveUninitialized: false,
