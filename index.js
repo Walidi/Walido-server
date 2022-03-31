@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
 const MySQLStore = require("express-mysql-session")(session);
 const mysql = require ('mysql');
 const cors = require('cors');
@@ -8,7 +9,6 @@ const port = process.env.PORT || 3001;
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
