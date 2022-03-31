@@ -25,6 +25,13 @@ app.use(cors({   //Parsing origin of the front-end
    credentials: true   //Allows cookies to be enabled
 }));  
 
+const db = mysql.createPool({  //Consider putting these values into environment variables 
+  user: "webapptest2300",
+  host: "den1.mysql4.gear.host",
+  password: "Ww74!ab!fL6B",
+  database: "webapptest2300",
+});
+
 app.get('/', (req, res) => res.send("Hi!"));
 
 app.use(cookieParser());
@@ -55,13 +62,6 @@ app.use(
       expires: 60 * 60 * 1000, //Expires after one hour
     }
   }));
-
-const db = mysql.createPool({  //Consider putting these values into environment variables 
-     user: "webapptest2300",
-     host: "den1.mysql4.gear.host",
-     password: "Ww74!ab!fL6B",
-     database: "webapptest2300",
-});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
