@@ -54,12 +54,14 @@ app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
+    proxy : true,
     store: sessionStore,
     resave: false,
     rolling: true,
     saveUninitialized: false,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
+      secure: true
     }
   }));
 
