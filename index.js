@@ -1,6 +1,4 @@
 const express = require("express");
-const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
-const MySQLStore = require("express-mysql-session")(session);
 const mysql = require ('mysql');
 const cors = require('cors');
 const multer = require("multer")
@@ -9,6 +7,7 @@ const port = process.env.PORT || 3001;
 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');  //Keeps the user logged in always (unless logged out or shut down)
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
@@ -25,45 +24,29 @@ app.use(cors({   //Parsing origin of the front-end
    credentials: true   //Allows cookies to be enabled
 }));  
 
-const db = mysql.createPool({  //Consider putting these values into environment variables 
-  user: "webapptest2300",
-  host: "den1.mysql4.gear.host",
-  password: "Ww74!ab!fL6B",
-  database: "webapptest2300",
-});
-
 app.get('/', (req, res) => res.send("Hi!"));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var sessionStore = new MySQLStore({
-  expiration: 10800000,
-  createDatabaseTable: true,
-  schema:{
-      tableName: 'sessionTable',
-      columnNames:{
-          session_id: 'sesssion_id',
-          expires: 'expires',
-          data: 'data'
-      }
-  }
-},db)
-
 app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
-    proxy : true,
-    store: sessionStore,
     resave: false,
     rolling: true,
     saveUninitialized: false,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      secure: true
     }
   }));
+
+const db = mysql.createPool({  //Consider putting these values into environment variables 
+     user: "webapptest2300",
+     host: "den1.mysql4.gear.host",
+     password: "Ww74!ab!fL6B",
+     database: "webapptest2300",
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
