@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json()); //Parsing Json
 
 app.use(cors({   //Parsing origin of the front-end
-   origin: ["https://walido-service.herokuapp.com/"], 
+   origin: ["http://localhost:3000"], 
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
