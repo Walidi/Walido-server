@@ -15,7 +15,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
 const app = express();
-app.set('trust proxy', 1)
+app.set("trust proxy", 1);
 
 app.use(express.json()); //Parsing Json
 
@@ -34,15 +34,13 @@ app.use(
   session({
     key: "user_sid",
     secret: "secret",    //Normally this has to be long and complex for security
-    resave: false,
+    resave: true,
     rolling: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
       secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      domain: "localhost:3000/"
+      sameSite: "none"
     }
   }));
 
