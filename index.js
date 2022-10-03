@@ -31,6 +31,13 @@ app.get('/', (req, res) => res.send("Hi!"));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const options = {
+  user: "webapptest2300",
+  host: "den1.mysql4.gear.host",
+  password: "Ww74!ab!fL6B",
+  database: "webapptest2300"
+}
+
 app.use(
   session({
     key: "user_sid",
@@ -46,13 +53,6 @@ app.use(
   }));
 
 const db = mysql.createPool(options);
-
-var options = {
-  user: "webapptest2300",
-  host: "den1.mysql4.gear.host",
-  password: "Ww74!ab!fL6B",
-  database: "webapptest2300"
-}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
