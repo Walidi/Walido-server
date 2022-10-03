@@ -360,8 +360,8 @@ app.patch('/updateMyProfile', verifyJWT, async(req, res) => {
    }
   })}
 })};
-})}})});
+})}})}); 
 
 app.listen(port, () => {
-  console.log('\x1b[32m%s\x1b[0m', 'Server running on port 3001!')
+  console.log('\x1b[32m%s\x1b[0m', `App running at http://localhost:${port}`)
 }); //port number server is running on
