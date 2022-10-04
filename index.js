@@ -47,8 +47,8 @@ app.use(
     saveUninitialized: false,
     cookie: {  //How long will the cookie live for?
       expires: 60 * 60 * 1000, //Expires after one hour
-      secure: true,
-      sameSite: "none"
+      //secure: true,
+      //sameSite: "none"
     }
   }));
 
