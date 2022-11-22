@@ -1,8 +1,9 @@
 const express = require("express");
 const mysql = require ('mysql');
 const cors = require('cors');
-const multer = require("multer")
 var fs = require('fs');
+const{google}= require("googleapis");
+
 const port = process.env.PORT || 3001;  //Port nr
 
 const bodyParser = require('body-parser');
@@ -14,6 +15,7 @@ const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 
 const jwt = require('jsonwebtoken');
+const { response } = require("express");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -25,6 +27,24 @@ app.use(cors({   //Parsing origin of the front-end
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
+
+const clientID = "1009761085984-i9nschhh4sjv4eubrbh3ae76p2fq9k35.apps.googleusercontent.com";
+const clientSecret = "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";
+const redirectURL = "https://developers.google.com/oauthplayground"
+const refreshToken = "1//04fB3gycY6SzFCgYIARAAGAQSNwF-L9Irw5HoTF1-ReaZLgdePGlvNniFd0Lft988CjsJ_UCEZRLPiFcf3-ZZYNPUsSeY6W8_dXI";
+
+const oAuth2Client = new google.auth.OAuth2(
+    clientID,
+    clientSecret,
+    redirectURL
+);
+
+oAuth2Client.setCredentials({refresh_token: refreshToken});
+
+const drive = google.drive({
+    version: 'v3',
+    auth: oAuth2Client,
+  });
 
 app.get('/', (req, res) => res.send("Hi!"));
 
@@ -54,18 +74,6 @@ app.use(
 
 const db = mysql.createPool(options);
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null,  './cvUploads');
-  },
-  filename: (req, file, cb) => { 
-      cb(null, Date.now() +'-'+ file.originalname)
-  } 
-});;
-
-const upload = multer({ storage: storage});
-
-
 db.query('SELECT 1 + 1 AS solution', function (error, results, fields) {  //Keeps pool/connection alive
   if (error) throw error;
   console.log('The solution is: ', results[0].solution);
@@ -88,7 +96,7 @@ const verifyJWT = (req, res, next) => { //Autherizing if user is allowed
   }
 };
 
-app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
+app.post("/uploadCV", verifyJWT, async(req, res) => {
 
    if (!req.file) {
       console.log("No file received");
@@ -101,32 +109,48 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const fileType = req.file.mimetype;
         const currentTime = new Date();
 
+        try {
+          const response = await drive.files.create({
+            requestBody: {
+              name: req.file.filename, 
+              mimeType: fileType
+            }, 
+            media: {
+              mimeType: fileType,
+              body: fs.createReadStream(req.file),
+            },
+          });
         console.log('file received!');
-        db.query("INSERT INTO CVs (uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?)", 
-        [uploaderID, req.file.filename, fileSize, fileType, currentTime],
+        db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?)", 
+        [response.data.id, uploaderID, req.file.filename, fileSize, fileType, currentTime],
         (err, result) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
             console.log(err);  
-         }
-      if (result) {
+           }
+         if (result) {
            db.query("UPDATE users set cvFile = ? WHERE id = ?", [req.file.filename, uploaderID],
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
                console.log(err);
              }
-      if (result) {
-            var filePath = `./cvUploads/${req.file.filename}`; 
+         if (result) {
             req.session.user[0].cvFile = req.file.filename;
-            res.send({user: req.session.user, message: req.file.filename.substring(14) +  " has been uploaded!"});
-            res.download(filePath, req.file.filename);
+            req.session.user[0].docID = response.data.id;
+            res.send({user: req.session.user, message: req.file.filename + " has been uploaded!"});
+            res.download(req.file, req.file.filename);
              }
              else {
                console.log(err);
              }
-           }
-)}})}});
+           })}
+          })}
+          catch (error) {
+             console.log(error.message);
+             res.send(error.message);
+          }
+        }});
 
 app.get('/getCV', verifyJWT, async(req, res, next) => {
         //Check if file exists for the user:
@@ -135,8 +159,8 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
           if (err)  {
               res.send({err: err}) //Sending error to front-end
               console.log(err);
-           } 
-       
+           }  
+        
         if (result.length>0) { //Checking if query returns a row
         var fileName = result[0].name;
         //If so, then do this by retrieving fileName from database related to the user:        
@@ -152,41 +176,40 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
     })});
 
 app.delete("/deleteCV", verifyJWT, async(req, res) => {
-
+  try {
+      const response = await drive.files.delete({
+      fileId: req.session.user[0].docID,
+    });
   db.query("DELETE FROM CVs WHERE uploaderID = ?;", (req.session.user[0].id), 
   (err, result) => {
     if (err)  {
       res.send({message: JSON.stringify(err)}) //Sending error to front-end
-      console.log(err);  
+      console.log(err+" status: "+ response.status);  
    }
    if (result) {
-   db.query("Select cvFile FROM users WHERE id = ?" , (req.session.user[0].id),
-   (err, result) => {
-     if (err) {
-      res.send({message: JSON.stringify(err)}) //Sending error to front-end
-      console.log(err);  
-     }
-     if (result) {
-      var fileName = result[0].cvFile;
-      fs.unlink(`./cvUploads/${fileName}`,(err) => {
-      if(err) throw err;
-      console.log(fileName + ' was deleted from user');
-      req.session.user[0].cvFile = "No file uploaded";
-      res.send({user: req.session.user, message: "File deleted!"})
-      db.query("UPDATE users SET cvFile = 'No file uploaded' WHERE id = ?;", (req.session.user[0].id),
-      (err, result) => {
-        if (err){
-            console.log(err);
+      db.query("UPDATE users SET cvFile = 'No file uploaded', set docID = null WHERE id = ?;", (req.session.user[0].id),
+      (err, result)=> {
+        if (err) {
+          res.send({message: JSON.stringify(err)}) //Sending error to front-end
+          console.log(err+" status: "+ response.status);  
         }
-      });
-     });
-   } 
-  });
-  }
-  else {
-    console.log(err);
-  }
-})});
+        if (result) {
+          console.log(req.session.user[0].cvFile + ' was deleted from user');
+          req.session.user[0].cvFile = "No file uploaded";
+          req.session.user[0].docID = null;
+          res.send({user: req.session.user, message: "File deleted!"})
+      }
+    } 
+    )}
+    else {
+      console.log(err);
+    }
+  })}
+    catch (error) {
+    console.log(error.message);
+    res.send(error.message);
+ }
+});
 
 app.post('/register', (req, res) => {
 
