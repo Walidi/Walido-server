@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
-const Readable = require('stream').Readable; 
+const multer = require('multer');
 const{google}= require("googleapis");
 
 const port = process.env.PORT || 3001;  //Port nr
@@ -59,13 +59,16 @@ const options = {
   database: "webapptest2300"
 }
 
-function bufferToStream(buffer) { 
-  var stream = new Readable();
-  stream.push(buffer);
-  stream.push(null);
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null,  './cvUploads');
+  },
+  filename: (req, file, cb) => { 
+      cb(null, Date.now() +'-'+ file.originalname)
+  } 
+});;
 
-  return stream;
-}
+const upload = multer({ storage: storage});
 
 app.use(
   session({
@@ -105,7 +108,7 @@ const verifyJWT = (req, res, next) => { //Autherizing if user is allowed
   }
 };
 
-app.post("/uploadCV", verifyJWT, async(req, res) => {
+app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
 
    if (!req.file) {
       console.log("No file received");
@@ -114,6 +117,8 @@ app.post("/uploadCV", verifyJWT, async(req, res) => {
 
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
+        const fileName = req.file.name;
+        const filePath = `./cvUploads/${req.file.filename}`; 
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
@@ -121,34 +126,34 @@ app.post("/uploadCV", verifyJWT, async(req, res) => {
         try {
           const response = await drive.files.create({
             requestBody: {
-              name: req.file.filename, 
+              name: fileName,
               mimeType: fileType
             }, 
             media: {
               mimeType: fileType,
-              body: bufferToStream(req.file.buffer),
+              body: fs.createReadStream(filePath)
             },
           });
         console.log('file received!');
         db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?)", 
-        [response.data.id, uploaderID, req.file.filename, fileSize, fileType, currentTime],
+        [response.data.id, uploaderID, fileName, fileSize, fileType, currentTime],
         (err, result) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
             console.log(err);  
            }
          if (result) {
-           db.query("UPDATE users set cvFile = ? WHERE id = ?", [req.file.filename, uploaderID],
+           db.query("UPDATE users set cvFile = ? WHERE id = ?", [fileName, uploaderID],
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
                console.log(err);
              }
          if (result) {
-            req.session.user[0].cvFile = req.file.filename;
+            req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = response.data.id;
-            res.send({user: req.session.user, message: req.file.filename + " has been uploaded!"});
-            res.download(req.file, req.file.filename);
+            res.send({user: req.session.user, message: fileName + " has been uploaded!"});
+            res.download(req.file, fileName);
              }
              else {
                console.log(err);
