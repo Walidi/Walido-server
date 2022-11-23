@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
-const multer = require("multer")
+const Readable = require('stream').Readable; 
 const{google}= require("googleapis");
 
 const port = process.env.PORT || 3001;  //Port nr
@@ -59,17 +59,13 @@ const options = {
   database: "webapptest2300"
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null,  './cvUploads');
-  },
-  filename: (req, file, cb) => { 
-      cb(null, Date.now() +'-'+ file.originalname)
-  } 
-});;
+function bufferToStream(buffer) { 
+  var stream = new Readable();
+  stream.push(buffer);
+  stream.push(null);
 
-const upload = multer({ storage: storage});
-
+  return stream;
+}
 
 app.use(
   session({
@@ -130,7 +126,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             }, 
             media: {
               mimeType: fileType,
-              body: fs.createReadStream(req.file),
+              body: bufferToStream(req.file.buffer),
             },
           });
         console.log('file received!');
