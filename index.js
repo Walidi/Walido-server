@@ -2,6 +2,7 @@ const express = require("express");
 const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
+const multer = require("multer")
 const{google}= require("googleapis");
 
 const port = process.env.PORT || 3001;  //Port nr
@@ -15,7 +16,7 @@ const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 
 const jwt = require('jsonwebtoken');
-const { response } = require("express");
+//const { response } = require("express");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -58,6 +59,18 @@ const options = {
   database: "webapptest2300"
 }
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null,  './cvUploads');
+  },
+  filename: (req, file, cb) => { 
+      cb(null, Date.now() +'-'+ file.originalname)
+  } 
+});;
+
+const upload = multer({ storage: storage});
+
+
 app.use(
   session({
     key: "user_sid",
@@ -96,7 +109,7 @@ const verifyJWT = (req, res, next) => { //Autherizing if user is allowed
   }
 };
 
-app.post("/uploadCV", verifyJWT, async(req, res) => {
+app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
 
    if (!req.file) {
       console.log("No file received");
