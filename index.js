@@ -3,6 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
+const path = require('path');
 const{google}= require("googleapis");
 
 const port = process.env.PORT || 3001;  //Port nr
@@ -64,7 +65,7 @@ const storage = multer.diskStorage({
       cb(null,  './cvUploads');
   },
   filename: (req, file, cb) => {  
-      cb(null, Date.now() +'-'+ file.originalname)
+      cb(null, file.originalname)
   } 
 });;
 
@@ -118,7 +119,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.name;
-        const filePath = `./cvUploads/${req.file.filename}`; 
+        const filePath = path.join(__dirname, fileName);
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
