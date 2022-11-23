@@ -105,7 +105,7 @@ const verifyJWT = (req, res, next) => { //Autherizing if user is allowed
   }
 };
 
-app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
+app.post("/uploadCV", verifyJWT, async(req, res) => {
 
    if (!req.file) {
       console.log("No file received");
