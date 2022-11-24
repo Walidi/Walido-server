@@ -119,7 +119,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.name;
-        const filePath = path.join(__dirname, 'uploads/',fileName);
+        const filePath = path.join(__dirname, 'uploads/'+fileName);
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
