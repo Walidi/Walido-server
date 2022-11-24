@@ -137,7 +137,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             },
           });
         console.log('file received!');
-        db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?)", 
+        console.log('file id is: ' + response.data.id);
+        db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?,?)", 
         [response.data.id, uploaderID, fileName, fileSize, fileType, currentTime],
         (err, result) => {
           if (err)  {
@@ -145,7 +146,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             console.log(err);  
            }
          if (result) {
-           db.query("UPDATE users set cvFile = ? WHERE id = ?", [fileName, uploaderID],
+           db.query("UPDATE users set cvFile = ?, set docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
