@@ -146,7 +146,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             console.log(err);  
            }
          if (result) {
-           db.query("UPDATE users set cvFile = ?, set docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
+           db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
