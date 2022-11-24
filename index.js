@@ -62,7 +62,7 @@ const options = {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null,  './cvUploads');
+      cb(null,  './public');
   },
   filename: (req, file, cb) => {  
       cb(null, file.originalname)
@@ -119,7 +119,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.name;
-        const filePath = path.join(__dirname, 'cvUploads/',fileName);
+        const filePath = path.join(__dirname, 'public/',fileName);
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
@@ -128,7 +128,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
           const response = await drive.files.create({
             requestBody: {
               name: fileName,
-              mimeType: fileType
+              mimeType: fileType,
+              parents: ["18C0Ttbs2ECQs3btM0uuEQgLdY-l0jq6u"]
             }, 
             media: {
               mimeType: fileType,
