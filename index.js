@@ -301,7 +301,7 @@ app.post('/login', async(req, res) => {
           }
        })
      } else {    //If nothing is matched from the inputs!
-       res.send({auth: false, message: "User does not exist!"});
+       res.send({auth: false, message: "Wrong email/password!"}); //This is meant to output "email not found" but stupid to indicate that 
        }
   }
 );
