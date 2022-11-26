@@ -168,8 +168,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
           })}
           catch (error) {
              console.log(error.message);
-             res.send(error.message);
              console.log("Error is on line 172!")
+             res.send(error.message);
           }
         }});
 
