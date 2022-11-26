@@ -150,11 +150,13 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
            db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
            (err, result) => {
              if (err) {
+               console.log("Errpr in update function 153");
                res.send({message: JSON.stringify(err)});
                console.log(err);
                console.log("Error is on line 155!");
              }
          if (result) {
+            console.log("Reaching result success  - line 158!");
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = response.data.id;
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
