@@ -144,6 +144,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
             console.log(err);  
+            console.log("Error is on line 147!")
            }
          if (result) {
            db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
@@ -151,6 +152,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
                console.log(err);
+               console.log("Error is on line 155!")
              }
          if (result) {
             req.session.user[0].cvFile = fileName;
@@ -160,12 +162,14 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
              else {
                console.log(err);
+               console.log("Error is on line 165!")
              }
            })}
           })}
           catch (error) {
              console.log(error.message);
              res.send(error.message);
+             console.log("Error is on line 172!")
           }
         }});
 
