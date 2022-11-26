@@ -119,7 +119,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
-        const filePath = path.join(__dirname, `./uploads/${fileName}`);
+        const filePath = path.join(__dirname, 'uploads/'+fileName);
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
@@ -185,7 +185,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         if (result.length>0) { //Checking if query returns a row
         var fileName = result[0].name;
         //If so, then do this by retrieving fileName from database related to the user:        
-        var filePath = `./uploads/${fileName}`; // Or format the path using the `id` rest param
+        var filePath = `uploads/${fileName}`; // Or format the path using the `id` rest param
         res.download(filePath, fileName);    
         //next();
         console.log('Succesfully sending ' + fileName + ' back to client!\nAnd location: ' + filePath);
