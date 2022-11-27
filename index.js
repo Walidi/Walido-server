@@ -160,17 +160,17 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = response.data.id;
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
-            res.download(req.file, fileName);
+            res.download(filePath, fileName);
              }
              else {
-               console.log(err);
-               console.log("Error is on line 165!");
+              console.log("Error is on line 165!");
+              console.log(err);
              }
            })}
           })}
           catch (error) {
-             console.log(error.message);
              console.log("Error is on line 172!");
+             console.log(error.message);
              res.send(error.message);
           }
         }});
@@ -187,7 +187,8 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         if (result.length>0) { //Checking if query returns a row
         var fileName = result[0].name;
         //If so, then do this by retrieving fileName from database related to the user:        
-        var filePath = `uploads/${fileName}`; // Or format the path using the `id` rest param
+        //var filePath = `uploads/${fileName}`; // Or format the path using the `id` rest param
+
         res.download(filePath, fileName);    
         //next();
         console.log('Succesfully sending ' + fileName + ' back to client!\nAnd location: ' + filePath);
