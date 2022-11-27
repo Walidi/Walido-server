@@ -124,7 +124,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const fileType = req.file.mimetype;
         const currentTime = new Date();
 
-        try {
+        //try {
           const response = await drive.files.create({
             requestBody: {
               name: fileName,
@@ -168,12 +168,14 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
            })}
           })}
+          /*
           catch (error) {
              console.log("Error is on line 172!");
              console.log(error.message);
              res.send(error.message);
-          }
-        }});
+          }*/
+       // }
+      });
 
 app.get('/getCV', verifyJWT, async(req, res, next) => {
         //Check if file exists for the user:
