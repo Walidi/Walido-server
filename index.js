@@ -124,7 +124,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const fileType = req.file.mimetype;
         const currentTime = new Date();
 
-        //try {
+        try {
           const response = await drive.files.create({
             requestBody: {
               name: fileName,
@@ -137,45 +137,37 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             },
           });
         console.log('file received!');
-        console.log('file id is: ' + response.data.id);
         db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?,?)", 
         [response.data.id, uploaderID, fileName, fileSize, fileType, currentTime],
         (err, result) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
             console.log(err);  
-            console.log("Error is on line 147!");
            }
          if (result) {
            db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
            (err, result) => {
              if (err) {
-               console.log("Errpr in update function 153");
                res.send({message: JSON.stringify(err)});
                console.log(err);
-               console.log("Error is on line 155!");
              }
          if (result) {
             console.log("Reaching result success  - line 158!");
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = response.data.id;
-            res.send({user: req.session.user, message: fileName + " has been uploaded!"});
+            res.send({user: req.session.user, message:/*fileName+*/"File has been uploaded!"});
             res.download(filePath, fileName);
              }
              else {
-              console.log("Error is on line 165!");
               console.log(err);
              }
            })}
           })}
-          /*
           catch (error) {
-             console.log("Error is on line 172!");
              console.log(error.message);
              res.send(error.message);
-          }*/
-       // }
-      });
+          }
+        }});
 
 app.get('/getCV', verifyJWT, async(req, res, next) => {
         //Check if file exists for the user:
