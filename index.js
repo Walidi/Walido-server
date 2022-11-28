@@ -156,7 +156,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = response.data.id;
             res.send({user: req.session.user, message:/*fileName+*/"File has been uploaded!"});
-            res.download(filePath, fileName);
+            //res.download(filePath, fileName);
              }
              else {
               console.log(err);
