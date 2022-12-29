@@ -16,7 +16,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
 
-import { storage } from "./firebase";
+import { storage } from "./firebase.js";
 
 import {
   ref,
