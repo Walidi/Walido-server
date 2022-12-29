@@ -125,7 +125,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const currentTime = new Date();
 
         try {
-          const response = await drive.files.create({
+          const response = await drive.files.create({ 
             requestBody: {
               name: fileName,
               mimeType: fileType,
