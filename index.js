@@ -4,8 +4,6 @@ const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
 const path = require('path');
-const{google}= require("googleapis");
-
 const port = process.env.PORT || 3001;  //Port nr
 
 const bodyParser = require('body-parser');
@@ -15,9 +13,20 @@ const MySQLStore = require('express-mysql-session')(session);
 
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
-
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
+
+import { storage } from "./firebase";
+
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  list,
+} from "firebase/storage";
+
+import { v4 } from "uuid";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -29,24 +38,6 @@ app.use(cors({   //Parsing origin of the front-end
    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
    credentials: true   //Allows cookies to be enabled
 }));  
-
-const clientID = "1009761085984-i9nschhh4sjv4eubrbh3ae76p2fq9k35.apps.googleusercontent.com";
-const clientSecret = "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";
-const redirectURL = "https://developers.google.com/oauthplayground"
-const refreshToken = "1//04Zfz0mJDHHh2CgYIARAAGAQSNwF-L9IrOLFsAn5eiXfaM3rkUaCQqT1N6m-hqMNuvMes1_UHMFlTGEZC5rIOuZRL_5xHsSzyC3k";
-
-const oAuth2Client = new google.auth.OAuth2(
-    clientID,
-    clientSecret,
-    redirectURL
-);
-
-oAuth2Client.setCredentials({refresh_token: refreshToken});
-
-const drive = google.drive({
-    version: 'v3',
-    auth: oAuth2Client,
-  });
 
 app.get('/', (req, res) => res.send("Hi!"));
 
@@ -119,54 +110,39 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
-        const filePath = path.join(__dirname, 'uploads/'+fileName);
+        const docID = fileName + v4()+"_"+uploaderID;
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
 
-        try {
-          const response = await drive.files.create({ 
-            requestBody: {
-              name: fileName,
-              mimeType: fileType,
-              parents: ["18C0Ttbs2ECQs3btM0uuEQgLdY-l0jq6u"]
-            }, 
-            media: {
-              mimeType: fileType,
-              body: fs.createReadStream(filePath)
-            },
-          });
         console.log('file received!');
         db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?,?)", 
-        [response.data.id, uploaderID, fileName, fileSize, fileType, currentTime],
+        [docID, uploaderID, fileName, fileSize, fileType, currentTime],
         (err, result) => {
           if (err)  {
             res.send({message: JSON.stringify(err)}) //Sending error to front-end
             console.log(err);  
            }
          if (result) {
-           db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, response.data.id, uploaderID],
+           db.query("UPDATE users set cvFile = ?, docID = ? WHERE id = ?", [fileName, docID, uploaderID],
            (err, result) => {
              if (err) {
                res.send({message: JSON.stringify(err)});
                console.log(err);
              }
          if (result) {
-            console.log("Reaching result success  - line 158!");
+          const imageRef = ref(storage, `cv_uploads/${docID}`);
+            uploadBytes(imageRef, req.file);
             req.session.user[0].cvFile = fileName;
-            req.session.user[0].docID = response.data.id;
-            res.send({user: req.session.user, message:/*fileName+*/"File has been uploaded!"});
+            req.session.user[0].docID = docID
+            res.send({user: req.session.user, message: fileName + " has been uploaded!"});
             //res.download(filePath, fileName);
              }
              else {
               console.log(err);
              }
            })}
-          })}
-          catch (error) {
-             console.log(error.message);
-             res.send(error.message);
-          }
+          })
         }});
 
 app.get('/getCV', verifyJWT, async(req, res, next) => {
@@ -185,7 +161,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
 
         res.download(filePath, fileName);    
         //next();
-        console.log('Succesfully sending ' + fileName + ' back to client!\nAnd location: ' + filePath);
+        console.log('Succesfully sending ' + fileName + ' back to client!');
         }
         else {
           res.send({message: "No file found for you!"});
