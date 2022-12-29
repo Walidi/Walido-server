@@ -15,18 +15,10 @@ const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
-
-import { storage } from "./firebase.js";
-
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  listAll,
-  list,
-} from "firebase/storage";
-
-import { v4 } from "uuid";
+const storage = require('./firebase');
+const ref = require('firebase/storage');
+const uploadBytes = require('firebase/storage');
+const v4 = require('uuid');
 
 const app = express();
 app.set("trust proxy", 1);
