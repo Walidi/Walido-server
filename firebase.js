@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getStorage } from "firebase/storage";
+const initializeApp = require("firebase/app");
+const getStorage = require('firebase/storage');
 
 const firebaseConfig = {
   apiKey: "AIzaSyAw80HvGbV0yrmrHJYWiivc3f1912YcIF4",
