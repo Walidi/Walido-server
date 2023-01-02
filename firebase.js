@@ -1,4 +1,4 @@
-const initializeApp = require("firebase/app");
+const firebaseApp = require("firebase/app");
 const getStorage = require('firebase/storage');
 
 const firebaseConfig = {
@@ -12,7 +12,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = firebaseApp.initializeApp(firebaseConfig);
 
 const storage = getStorage(app);
 
