@@ -16,9 +16,10 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
 const storage = require('./firebase');
-const ref = require('firebase/storage');
+const firebaseRef = require('firebase/storage');
 const uploadBytes = require('firebase/storage');
 const v4 = require('uuid');
+const ref = firebaseRef.ref();
 
 const app = express();
 app.set("trust proxy", 1);
