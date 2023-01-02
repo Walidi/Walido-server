@@ -3,7 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
-const path = require('path');
+//const path = require('path');
 const port = process.env.PORT || 3001;  //Port nr
 
 const bodyParser = require('body-parser');
