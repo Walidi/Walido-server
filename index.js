@@ -17,6 +17,7 @@ const jwt = require('jsonwebtoken');
 //const { response } = require("express");
 const storage = require('./firebase');
 const firebaseRef = require('firebase/storage');
+const firebaseUpload = require('firebase/storage');
 const uploadBytes = require('firebase/storage');
 const v4 = require('uuid');
 
@@ -124,7 +125,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
           const imageRef = firebaseRef.ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(imageRef, req.file);
+            firebaseUpload.uploadBytes(imageRef, req.file);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
