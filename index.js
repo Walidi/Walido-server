@@ -3,7 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
-//const path = require('path');
+const path = require('path');
 const port = process.env.PORT || 3001;  //Port nr
 
 const bodyParser = require('body-parser');
@@ -18,7 +18,6 @@ const jwt = require('jsonwebtoken');
 const storage = require('./firebase');
 const firebaseRef = require('firebase/storage');
 const firebaseUpload = require('firebase/storage');
-const uploadBytes = require('firebase/storage');
 const v4 = require('uuid');
 
 const app = express();
@@ -104,6 +103,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
         const docID = fileName + v4.v4()+"_"+uploaderID;
+        const filePath = path.join(__dirname, 'uploads/'+fileName);
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
@@ -125,7 +125,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
           const imageRef = firebaseRef.ref(storage, `cv_uploads/${docID}`);
-            firebaseUpload.uploadBytes(imageRef, req.file);
+            firebaseUpload.uploadBytes(imageRef, filePath);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
