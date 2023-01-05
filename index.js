@@ -100,9 +100,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        const fileBlob = Blob(
-        [req.file], 
-        {type: 'application/pdf'});
+        const fileArray = Uint8Array.from(req.file);
 
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
@@ -128,7 +126,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = firebaseRef.ref(storage, `cv_uploads/${docID}`);
-            firebaseUpload.uploadBytes(fileRef, fileBlob);
+            firebaseUpload.uploadBytes(fileRef, fileArray);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
