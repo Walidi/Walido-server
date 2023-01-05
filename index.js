@@ -102,7 +102,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        const buff = Buffer.from(req.file); // Node.js Buffer
+        const buff = Buffer.from([req.file]); // Node.js Buffer
         const blob = new Blob([buff]); // JavaScript Blob
 
         const uploaderID = req.session.user[0].id;  //ID from user's session
