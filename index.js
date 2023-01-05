@@ -100,7 +100,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        const fileBlob = new Blob(
+        const fileBlob = Blob(
         [req.file], 
         {type: 'application/pdf'});
 
