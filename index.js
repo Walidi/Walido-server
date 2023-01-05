@@ -18,9 +18,7 @@ const jwt = require('jsonwebtoken');
 const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
-const v4 = require('uuid');
-
-const { Blob } = require("buffer");
+const {v4} = require('uuid');
 
 const app = express();
 app.set("trust proxy", 1);
@@ -102,12 +100,10 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        const buff = Buffer.from([req.file]); // Node.js Buffer
-        const blob = new Blob([buff]); // JavaScript Blob
-
+        
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
-        const docID = fileName + v4.v4()+"_"+uploaderID;
+        const docID = fileName + v4()+"_"+uploaderID;
         const fileSize = req.file.size;
         const fileType = req.file.mimetype;
         const currentTime = new Date();
@@ -129,7 +125,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, blob);
+            uploadBytes(fileRef, req.file);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
