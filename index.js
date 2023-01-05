@@ -20,6 +20,8 @@ const firebaseRef = require('firebase/storage');
 const firebaseUpload = require('firebase/storage');
 const v4 = require('uuid');
 
+const { Blob } = require("buffer");
+
 const app = express();
 app.set("trust proxy", 1);
 
@@ -100,7 +102,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        const fileArray = Uint8Array.from(req.file);
+        const buff = Buffer.from(req.file); // Node.js Buffer
+        const blob = new Blob([buff]); // JavaScript Blob
 
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
@@ -126,7 +129,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = firebaseRef.ref(storage, `cv_uploads/${docID}`);
-            firebaseUpload.uploadBytes(fileRef, fileArray);
+            firebaseUpload.uploadBytes(fileRef, blob);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
