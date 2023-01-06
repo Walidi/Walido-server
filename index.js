@@ -124,6 +124,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
                console.log(err);
              }
          if (result) {
+            console.log('FILE IS: ' + req.file);
             const fileRef = ref(storage, `cv_uploads/${docID}`);
             uploadBytes(fileRef, req.file);
             req.session.user[0].cvFile = fileName;
