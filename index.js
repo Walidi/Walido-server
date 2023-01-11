@@ -92,7 +92,7 @@ const verifyJWT = (req, res, next) => { //Autherizing if user is allowed
   }
 };
 
-app.post("/uploadCV",  express.json({limit: '5mb'}), verifyJWT/*, upload.single('file')*/, async(req, res) => {
+app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
 
    if (!req.file) {
       console.log("No file received");
@@ -107,7 +107,7 @@ app.post("/uploadCV",  express.json({limit: '5mb'}), verifyJWT/*, upload.single(
         const fileName = req.file.filename;
         const docID = fileName + v4()+"_"+uploaderID;
         const fileSize = req.file.size;
-        const fileType = req.file.mimetype;
+        const fileType = req.file.mimetype; 
         const currentTime = new Date();
 
         console.log('file received!');
