@@ -100,6 +100,8 @@ app.post("/uploadCV", verifyJWT/*, upload.single('file')*/, async(req, res) => {
     } 
 
     else {
+
+       console.log("File logged:" + req.file);
         
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
