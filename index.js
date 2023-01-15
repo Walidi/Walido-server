@@ -15,11 +15,30 @@ const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
-const {storage} = require('./firebase');
+//const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
 const {v4} = require('uuid');
 const { stringify } = require("querystring");
+
+const {initializeApp} = require("firebase/app");
+const {getStorage} = require('firebase/storage');
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAw80HvGbV0yrmrHJYWiivc3f1912YcIF4",
+  authDomain: "webauth-2ac45.firebaseapp.com",
+  projectId: "webauth-2ac45",
+  storageBucket: "webauth-2ac45.appspot.com",
+  messagingSenderId: "136626980163",
+  appId: "1:136626980163:web:963db3dbdaf09d9bab5bf6",
+  measurementId: "G-W2THV32VWK"
+};
+
+// Initialize Firebase
+const fireApp = initializeApp(firebaseConfig);
+
+const storage = getStorage(fireApp);
+
 
 const app = express();
 app.set("trust proxy", 1);
@@ -127,7 +146,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, fileUpload);
+            uploadBytes(fileRef, req.file);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
