@@ -103,8 +103,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     else {
         //Below works but does not send file in correct format (pdf)
 
-        const fileString = stringify(req.file);
-        const fileBuffer = Buffer.from(fileString); 
+       // const fileString = stringify(req.file);
+      // const fileBuffer = Buffer.from(fileString); 
 
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
@@ -130,7 +130,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, fileBuffer);
+            uploadBytes(fileRef, req.file);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
