@@ -132,7 +132,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const storageRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(storageRef, readFileSync(file.path), {contentType: fileType});
+            uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType});
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
