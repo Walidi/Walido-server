@@ -113,6 +113,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
         const fileType = req.file.mimetype; 
         const currentTime = new Date();
 
+        const blob = new Blob([new Uint8Array(req.file)], {type: fileType });
+
         console.log('file received!');
         db.query("INSERT INTO CVs (docID, uploaderID, name, size, type, uploaded_at) VALUES (?,?,?,?,?,?)", 
         [docID, uploaderID, fileName, fileSize, fileType, currentTime],
@@ -130,7 +132,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, req.file);
+            uploadBytes(fileRef, blob);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
