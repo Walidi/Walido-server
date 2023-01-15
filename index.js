@@ -14,25 +14,11 @@ const MySQLStore = require('express-mysql-session')(session);
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
-//const { response } = require("express");
-//const {storage} = require('./firebase');
+//const { response } = require("express");/const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
 const {v4} = require('uuid');
 const { stringify } = require("querystring");
-
-const {initializeApp} = require("firebase/app");
-const {getStorage} = require('firebase/storage');
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAw80HvGbV0yrmrHJYWiivc3f1912YcIF4",
-  authDomain: "webauth-2ac45.firebaseapp.com",
-  projectId: "webauth-2ac45",
-  storageBucket: "webauth-2ac45.appspot.com",
-  messagingSenderId: "136626980163",
-  appId: "1:136626980163:web:963db3dbdaf09d9bab5bf6",
-  measurementId: "G-W2THV32VWK"
-};
 
 // Initialize Firebase
 const fireApp = initializeApp(firebaseConfig);
@@ -120,9 +106,11 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-        
+        //Below works but does not send file in correct format (pdf)
+
         const fileString = stringify(req.file);
         const fileBuffer = Buffer.from(fileString); 
+
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
         const docID = fileName + v4()+"_"+uploaderID;
