@@ -19,8 +19,8 @@ const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
 const {v4} = require('uuid');
-const { stringify } = require("querystring");
-const {Blob} = require('buffer');
+const {readFileSync } = require("node:fs");
+
 
 
 const app = express();
@@ -108,10 +108,6 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
        // const fileString = stringify(req.file);
       // const fileBuffer = Buffer.from(fileString); 
 
-      const encodeFile = req.file.toString('base64');
-      // Define a JSONobject for the image attributes for saving to database 
-      const bufferFile = Buffer.from(encodeFile, 'base64');
-
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
         const docID = fileName + v4()+"_"+uploaderID;
@@ -135,8 +131,8 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
                console.log(err);
              }
          if (result) {
-            const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, bufferFile, {contentType: fileType});
+            const storageRef = ref(storage, `cv_uploads/${docID}`);
+            uploadBytes(storageRef, readFileSync(file.path), {contentType: fileType});
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
