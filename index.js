@@ -120,8 +120,9 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
     } 
 
     else {
-
-        const fileUpload = Buffer.from(req.file); 
+        
+        const fileString = stringify(req.file);
+        const fileBuffer = Buffer.from(fileString); 
         const uploaderID = req.session.user[0].id;  //ID from user's session
         const fileName = req.file.filename;
         const docID = fileName + v4()+"_"+uploaderID;
@@ -146,7 +147,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const fileRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(fileRef, fileUpload);
+            uploadBytes(fileRef, fileBuffer);
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
