@@ -14,17 +14,12 @@ const MySQLStore = require('express-mysql-session')(session);
 const bcrypt = require('bcryptjs'); //Cryption function
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
-//const { response } = require("express");/const {storage} = require('./firebase');
+//const { response } = require("express");
+const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
 const {v4} = require('uuid');
 const { stringify } = require("querystring");
-
-// Initialize Firebase
-const fireApp = initializeApp(firebaseConfig);
-
-const storage = getStorage(fireApp);
-
 
 const app = express();
 app.set("trust proxy", 1);
