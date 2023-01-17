@@ -162,12 +162,12 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         
         if (result.length>0) { //Checking if query returns a row
         var fileName = result[0].name;
-        //If so, then do this by retrieving fileName from database related to the user:        
-        //var filePath = `uploads/${fileName}`; // Or format the path using the `id` rest param
+        var docID = result[0].docID;
 
-        res.download(filePath, fileName);    
-        //next();
-        console.log('Succesfully sending ' + fileName + ' back to client!');
+        var filePath = storage.ref(`cv_uploads/${docID}`);
+
+        res.download(filePath, fileName);  
+
         }
         else {
           res.send({message: "No file found for you!"});
