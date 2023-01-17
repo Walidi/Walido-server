@@ -164,7 +164,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         var fileName = result[0].name;
         var docID = result[0].docID;
 
-        var filePath = storage.ref(`cv_uploads/${docID}`);
+        var filePath = ref(storage, `cv_uploads/${docID}`);
 
         res.download(filePath, fileName);  
 
