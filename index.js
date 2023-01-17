@@ -133,10 +133,13 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const storageRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType})
-              getDownloadURL(storageRef).then((url) => {
-              res.download(url, fileName);
+
+              uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType}).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                  res.download(url, fileName);
+                });
               });
+              
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
