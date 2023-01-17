@@ -18,6 +18,7 @@ const jwt = require('jsonwebtoken');
 const {storage} = require('./firebase');
 const {ref} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
+const {getDownloadURL} = require('firebase/storage');
 const {v4} = require('uuid');
 const {readFileSync } = require("node:fs");
 
@@ -132,11 +133,13 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
              }
          if (result) {
             const storageRef = ref(storage, `cv_uploads/${docID}`);
-            uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType});
+            uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType})
+              getDownloadURL(storageRef).then((url) => {
+              res.download(url, fileName);
+              });
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
             res.send({user: req.session.user, message: fileName + " has been uploaded!"});
-            //res.download(filePath, fileName);
              }
              else {
               console.log(err);
