@@ -161,8 +161,8 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
            }  
         
         if (result.length>0) { //Checking if query returns a row
-        var fileName = result[0].name;
-        var docID = result[0].docID;
+        const fileName = result[0].name;
+        const docID = result[0].docID;
 
         //var filePath = ref(storage, `cv_uploads/${docID}`);
 
