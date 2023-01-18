@@ -164,11 +164,8 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         const fileName = result[0].name;
         const docID = result[0].docID;
 
-        //var filePath = ref(storage, `cv_uploads/${docID}`);
-
         getDownloadURL(ref(storage, `cv_uploads/${docID}`)).then((url) => {
-          const file = fs.createWriteStream(url);
-          res.pipe(file);  
+          console.log(url);  
         })
 
         }
