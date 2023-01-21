@@ -168,7 +168,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
 
         const url = getDownloadURL(storageRef);
 
-        console.log('URL IS : ' + url);
+        console.log(`====> URL is ${url} <=======`);
 
         }
         else {
