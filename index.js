@@ -164,7 +164,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         const fileName = result[0].name;
         const docID = result[0].docID;
 
-        const storageRef = ref(storage, `cv_uploads/${docID}`);
+        const storageRef = ref(storage, `cv_uploads/${docID}.pdf`);
 
         getDownloadURL(storageRef).then(function(url) {
           console.log("URL is: " + url);
