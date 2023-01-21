@@ -164,10 +164,12 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         const fileName = result[0].name;
         const docID = result[0].docID;
 
-        getDownloadURL(ref(storage, `cv_uploads/${docID}`)).then((url) => {
-          console.log('URL IS: ' + url);  
-        })
+        const storageRef = ref(storage, `cv_uploads/${docID}`);
 
+        storageRef.getDownloadURL().then(function(url) {
+          console.log("URL is: " + url);
+        });
+      
         }
         else {
           res.send({message: "No file found for you!"});
