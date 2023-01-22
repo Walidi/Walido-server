@@ -153,7 +153,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
 
 app.get('/getCV', verifyJWT, async(req, res, next) => {
         //Check if file exists for the user:
-        db.query("SELECT name FROM CVs WHERE uploaderID = ?", (req.session.user[0].id),
+        db.query("SELECT name, docID FROM CVs WHERE uploaderID = ?", (req.session.user[0].id),
         (err, result) => {
           if (err)  {
               res.send({err: err}) //Sending error to front-end
@@ -163,14 +163,11 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         if (result.length>0) { //Checking if query returns a row
         const fileName = result[0].name;
         const docID = result[0].docID;
-
         const storageRef = ref(storage, `cv_uploads/${docID}`);
 
-        console.log('DocID is: ' + docID);
-
-       // getDownloadURL(ref(storage, `cv_uploads/${docID}`)).then((url) => {
-         //  console.log('::::URL IS:  ' + url);
-        // })
+        getDownloadURL(storageRef).then((url) => {
+           console.log('::::URL IS:  ' + url);
+         })
 
         }
         else {
