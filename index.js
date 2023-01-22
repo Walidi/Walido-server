@@ -3,6 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
+const http = require("http");
 const path = require('path');
 const port = process.env.PORT || 3001;  //Port nr
 
@@ -134,11 +135,7 @@ app.post("/uploadCV", verifyJWT, upload.single('file'), async(req, res) => {
          if (result) {
             const storageRef = ref(storage, `cv_uploads/${docID}`);
 
-              uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType}).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((url) => {
-                  res.download(url, fileName);
-                });
-              });
+            uploadBytes(storageRef, readFileSync(req.file.path), {contentType: fileType});
               
             req.session.user[0].cvFile = fileName;
             req.session.user[0].docID = docID
@@ -166,7 +163,9 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         const storageRef = ref(storage, `cv_uploads/${docID}`);
 
         getDownloadURL(storageRef).then((url) => {
-           console.log('::::URL IS:  ' + url);
+           http.get(url, function(file) {
+            res.pipe(file);
+          });
          })
 
         }
