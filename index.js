@@ -166,9 +166,9 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
 
         const storageRef = ref(storage, `cv_uploads/${docID}`);
 
-        const url = getDownloadURL(storageRef);
-
-        console.log(`====> URL is ${url} <=======`);
+        getDownloadURL(ref(storage, `cv_uploads/${docID}`)).then((url) => {
+           console.log('::::URL IS:  ' + url);
+         })
 
         }
         else {
