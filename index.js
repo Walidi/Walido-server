@@ -3,7 +3,7 @@ const mysql = require ('mysql');
 const cors = require('cors');
 var fs = require('fs');
 const multer = require('multer');
-const http = require("http");
+const https = require("http");
 const path = require('path');
 const port = process.env.PORT || 3001;  //Port nr
 
@@ -163,7 +163,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         const storageRef = ref(storage, `cv_uploads/${docID}`);
 
         getDownloadURL(storageRef).then((url) => {
-           http.get(url, function(file) {
+           https.get(url, function(file) {
             res.pipe(file);
           });
          })
