@@ -160,11 +160,12 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
         if (result.length>0) { //Checking if query returns a row
         const fileName = result[0].name;
         const docID = result[0].docID;
+        const cvFile = fs.createWriteStream(fileName);
         const storageRef = ref(storage, `cv_uploads/${docID}`);
 
         getDownloadURL(storageRef).then((url) => {
            https.get(url, function(file) {
-            res.pipe(file);
+            res.pipe(cvFile);
           });
          })
 
