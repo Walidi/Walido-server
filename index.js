@@ -164,7 +164,6 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
 
         getDownloadURL(storageRef).then((url) => {
            https.get(url, function(file) {
-            res.header('Content-Disposition', 'attachment; filename="new file name.pdf"');
             file.pipe(res);
           });
          })
