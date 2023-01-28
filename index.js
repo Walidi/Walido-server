@@ -164,7 +164,7 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
 
         getDownloadURL(storageRef).then((url) => {
            https.get(url, function(file) {
-            res.header(`filename=${fileName}`);
+            res.header(`Content-Disposition', 'attachment; filename=${fileName}`);
             file.pipe(res);
           });
          })
