@@ -17,7 +17,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 //const { response } = require("express");
 const {storage} = require('./firebase');
-const {ref} = require('firebase/storage');
+const {ref, deleteObject} = require('firebase/storage');
 const {uploadBytes} = require('firebase/storage');
 const {getDownloadURL} = require('firebase/storage');
 const {v4} = require('uuid');
@@ -176,10 +176,10 @@ app.get('/getCV', verifyJWT, async(req, res, next) => {
     })});
 
 app.delete("/deleteCV", verifyJWT, async(req, res) => {
-  try {
-      const response = await drive.files.delete({
-      fileId: req.session.user[0].docID,
-    });
+
+  const docID = req.session.user[0].docID;
+  const storageRef = ref(storage, `cv_uploads/${docID}`);
+ 
   db.query("DELETE FROM CVs WHERE uploaderID = ?;", (req.session.user[0].id), 
   (err, result) => {
     if (err)  {
@@ -194,22 +194,22 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
           console.log(err+" status: "+ response.status);  
         }
         if (result) {
+          deleteObject(storageRef).then(() => {
           console.log(req.session.user[0].cvFile + ' was deleted from user');
           req.session.user[0].cvFile = "No file uploaded";
           req.session.user[0].docID = null;
-          res.send({user: req.session.user, message: "File deleted!"})
+          res.send({user: req.session.user, message: "File deleted!"});
+          }).catch((error) => {
+            res.send({user: req.session.user, message: "File could not be deleted from server!"});
+            console.log(error);
+          })
       }
     } 
     )}
     else {
       console.log(err);
     }
-  })}
-    catch (error) {
-    console.log(error.message);
-    res.send(error.message);
- }
-});
+  })});
 
 app.post('/register', (req, res) => {
 
