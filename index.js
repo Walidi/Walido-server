@@ -187,7 +187,7 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
       console.log(err);  
    }
    if (result) {
-      db.query("UPDATE users SET cvFile = 'No file uploaded', set docID = null WHERE id = ?;", (req.session.user[0].id),
+      db.query("UPDATE users SET cvFile = 'No file uploaded', docID = null WHERE id = ?;", (req.session.user[0].id),
       (err, result)=> {
         if (err) {
           res.send({message: JSON.stringify(err)}) //Sending error to front-end
@@ -200,7 +200,7 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
           req.session.user[0].docID = null;
           res.send({user: req.session.user, message: "File deleted!"});
           }).catch((error) => {
-            res.send({user: req.session.user, message: "File could not be deleted from server!"});
+            res.send({message: "File could not be deleted from server!"});
             console.log(error);
           })
       }
