@@ -184,14 +184,14 @@ app.delete("/deleteCV", verifyJWT, async(req, res) => {
   (err, result) => {
     if (err)  {
       res.send({message: JSON.stringify(err)}) //Sending error to front-end
-      console.log(err+" status: "+ response.status);  
+      console.log(err);  
    }
    if (result) {
       db.query("UPDATE users SET cvFile = 'No file uploaded', set docID = null WHERE id = ?;", (req.session.user[0].id),
       (err, result)=> {
         if (err) {
           res.send({message: JSON.stringify(err)}) //Sending error to front-end
-          console.log(err+" status: "+ response.status);  
+          console.log(err);  
         }
         if (result) {
           deleteObject(storageRef).then(() => {
